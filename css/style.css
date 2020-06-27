@@ -284,7 +284,7 @@ body{
     background-position: 0 0;
     background-repeat: no-repeat;
     cursor: pointer;
-    height: 10px;
+    height: 16px !important
     left: -6px;
     border: solid 1px #ff5a71;
     border-radius: 50%;
