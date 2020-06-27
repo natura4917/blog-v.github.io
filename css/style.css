@@ -287,7 +287,7 @@ body{
     height: 16px;
     left: -6px;
     border: solid 1px #ff5a71;
-    border-radius: 30px;
+    border-radius: 50%;
     position: absolute;
     background: #ff5a71;
     top: -5px;
