@@ -1,5 +1,4 @@
 
-var context = new AudioContext();
 
 $(document).ready(function() {
     var widget = SC.Widget(document.getElementById('so'));
