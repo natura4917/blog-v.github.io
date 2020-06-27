@@ -1,7 +1,7 @@
-var $jq = jQuery.noConflict();
+
 var context = new AudioContext();
 
-$jq(document).ready(function() {
+$(document).ready(function() {
     var widget = SC.Widget(document.getElementById('so'));
     var allSongs;
 
@@ -9,9 +9,79 @@ $jq(document).ready(function() {
         // widget.play();
         console.log('Ready...');
         widget.getSounds(function(allSounds) {
-            $jq('#display_song').text(allSounds[0]['title']);
+            $('#display_song').text(allSounds[0]['title']);
 
-            allSongs = allSounds
+            allSongs = allSounds;
+            Audio.allSongs=allSongs;
+            // data-id="1"
+            // data-album=""
+            // data-artist="Wiz Khalifa feat. Charlie Puth"
+            // data-title="See You Again"
+            // data-albumart="http://static.djbooth.net/pics-tracks/wiz-khalifa-see-you-again.jpg"
+            // data-url="http://trendingmp3.com/music/user_folder/Wiz%20Khalifa%20See%20You%20Again%20Feat%20Charlie%20Puth%20-%201426839506.mp3"></a>
+            $.each(allSongs,function(i,d) {
+                if (d['artwork_url'] == null) {
+                    imageUrl = d['user']['avatar_url'];
+                } else {
+                    imageUrl = d['artwork_url'];
+                }
+                $('.play-list').append($('<a/>', {
+                    class: 'play',
+                    "data-id": i,
+                    "data-title": d.title,
+                    "data-artist": d.user.username,
+                    "data-albumart": imageUrl,
+                    "data-album": d.description,
+                    "data-duration":d.duration
+                }));
+
+                
+			$('.play-list .play').each(function(){
+				var album,albumart,artist,title;
+				album=$(this).data('album');
+				albumart=$(this).data('albumart');
+				artist=$(this).data('artist');
+				title=$(this).data('title');
+
+				album=album?'<span class="album">'+album+'</span>':'Unknown Album';
+				albumart=albumart?'<img src="'+albumart+'">':'';
+				artist=artist?'<span class="song-artist">'+artist+'</span>':'Unknown Artist';
+				title=title?'<div class="song-title">'+title+'</div>':'Unknown Title';
+
+				$(this).html('<div class="album-thumb pull-left">'+albumart+'</div><div class="songs-info pull-left">'+title+'<div class="songs-detail">'+artist+' - '+album+'</div></div></div>');
+            });
+            
+            var id, album, artist, albumart, title, mp3;
+            $('.play-list .play').each(function(){
+                if($(this).data('id') == 0){
+                    id = $(this).data('id');
+                    album = $(this).data('album');
+                    artist = $(this).data('artist');
+                    albumart = $(this).data('albumart');
+                    title = $(this).data('title');
+                    mp3 = $(this).data('url');
+                    Audio.load(id,album,artist,title,albumart,mp3);
+                }
+                $(this).on('click',function(e){
+                    e.preventDefault();
+                    $(this).siblings().removeClass('active');
+                    $(this).addClass('active');
+                    // clearInterval(intval);
+                    id = $(this).data('id');
+                    album = $(this).data('album');
+                    artist = $(this).data('artist');
+                    albumart = $(this).data('albumart');
+                    title = $(this).data('title');
+                    mp3 = $(this).data('url');
+                    Audio.load(id,album,artist,title,albumart,mp3);
+                    widget.skip(id); //Go to last Song of playlist
+                    // $('.music').prop('volume',$('.volume').val());
+                    Audio.playlist.hide();
+                });
+            });
+              
+                
+            });
             console.log(allSongs);
             var imageUrl = "";
             if (allSounds[0]['artwork_url'] == null) {
@@ -20,16 +90,16 @@ $jq(document).ready(function() {
                 imageUrl = allSongs[0]['artwork_url'];
             }
 
-            $jq('#display_coverart').css("background-image", 'url('+imageUrl+')'); 
-            $jq('.current_playlist_header_item').text(allSounds[0]['user']['username'] + " PLAYLIST");
+            $('#display_coverart').css("background-image", 'url('+imageUrl+')'); 
+            $('.current_playlist_header_item').text(allSounds[0]['user']['username'] + " PLAYLIST");
             var duration = allSounds[0]['duration'];
             var seconds = Math.floor((duration / 1000) % 60);
             var minutes = Math.floor((duration / (60 * 1000)) % 60);
 
             if (seconds < 10) {
-                $jq('#display_time_total').text(minutes + ':0' + seconds);
+                $('#display_time_total').text(minutes + ':0' + seconds);
             } else {
-                $jq('#display_time_total').text(minutes + ':' + seconds);
+                $('#display_time_total').text(minutes + ':' + seconds);
             };
         });
 
@@ -39,20 +109,18 @@ $jq(document).ready(function() {
 
         widget.isPaused(function(paused){
             if (paused == false){
-                document.getElementById('pause_button').style.display = 'block';
-                document.getElementById('play_button').style.display = 'none';
+                $('.play-pause').addClass('active');
             }
             else{
-                document.getElementById('pause_button').style.display = 'none';
-                document.getElementById('play_button').style.display = 'block';
+                $('.play-pause').removeClass('active');
             }
         });
 
-        $jq(function(){
-            var nav = $jq('#current_playlist');
+        $(function(){
+            var nav = $('#current_playlist');
             nav.addClass('showing');});
-        $jq('#current_playlist').delay(500).fadeTo(1000, 1).delay(500).queue(function(){
-            var nav = $jq('#current_playlist');
+        $('#current_playlist').delay(500).fadeTo(1000, 1).delay(500).queue(function(){
+            var nav = $('#current_playlist');
             nav.removeClass('showing').addClass('hiding');
         });
     });
@@ -62,30 +130,28 @@ $jq(document).ready(function() {
         console.log('Play');
         widget.isPaused(function(paused){
             if (paused == false){
-                document.getElementById('pause_button').style.display = 'block';
-                document.getElementById('play_button').style.display = 'none';
+                $('.play-pause').addClass('active');
             }
             else{
-                document.getElementById('pause_button').style.display = 'none';
-                document.getElementById('play_button').style.display = 'block';
+                $('.play-pause').removeClass('active');
             }
         });
 
         //SLIDER FOR PROGRESS BAR
-        $jq(function() {
+        $(function() {
             var init = function() {
                 var widget = SC.Widget(document.getElementById('so'));
                 widget.getDuration(function(duration) {
                     console.log('duration: ' + duration);
                     //Create a slider 
                     //var duration = Math.round(duration / 1000);
-                    $jq('#display_progress').noUiSlider2('init', {
+                    $('#display_progress').noUiSlider2('init', {
                         start: [0],
                         scale: [0, duration],
                         handles: 1,
                         connect: "lower",
                         change: function() {
-                            var values = $jq('#display_progress').noUiSlider2('value');
+                            var values = $('#display_progress').noUiSlider2('value');
                             widget.getPosition(function(position) {
                                 widget.seekTo(values[1]);
                             });
@@ -96,21 +162,21 @@ $jq(document).ready(function() {
             init.call();
         });
         //Remove previous Progress Bar
-        $jq(".noUi-midBar2").remove();
-        $jq(".noUi-handle2").remove();
-
-        var values = $jq('#volume_back').noUiSlider('value');
+        $(".noUi-midBar2").remove();
+        $(".noUi-handle2").remove();
+    
+        var values = $('#volume_back').noUiSlider('value');
         widget.setVolume(values[1]);	
         widget.getCurrentSound(function(currentSound) {
             //console.log(currentSound);
-            $jq('#display_song').text(currentSound['title']);
+            $('#display_song').text(currentSound['title']);
             var imageUrl = "";
             if (currentSound['artwork_url'] == null) {
                 imageUrl = currentSound['user']['avatar_url'];
             } else {
                 imageUrl = currentSound['artwork_url'];
             }
-            $jq('#display_coverart').css("background-image", 'url('+imageUrl+')'); 
+            $('#display_coverart').css("background-image", 'url('+imageUrl+')'); 
         });
 
         //display_time_total
@@ -118,9 +184,9 @@ $jq(document).ready(function() {
             var seconds = Math.floor((duration / 1000) % 60);
             var minutes = Math.floor((duration / (60 * 1000)) % 60);
             if (seconds < 10) {
-                $jq('#display_time_total').text(minutes + ':0' + seconds);
+                $('#display_time_total').text(minutes + ':0' + seconds);
             } else {
-                $jq('#display_time_total').text(minutes + ':' + seconds);
+                $('#display_time_total').text(minutes + ':' + seconds);
             };
         });
 
@@ -129,12 +195,10 @@ $jq(document).ready(function() {
         console.log('Pause');
         widget.isPaused(function(paused){
             if (paused == false){
-                document.getElementById('pause_button').style.display = 'block';
-                document.getElementById('play_button').style.display = 'none';
+                $('.play-pause').addClass('active');
             }
             else{
-                document.getElementById('pause_button').style.display = 'none';
-                document.getElementById('play_button').style.display = 'block';
+                $('.play-pause').removeClass('active');
             }
         });
 
@@ -144,38 +208,51 @@ $jq(document).ready(function() {
         //console.log('Loading...');
     });
 
-    $jq('#play_button').click(function() {
-        console.log(widget);
-        widget.seekTo(0);
-        widget.play(); 
-        widget["play"]();
+    $('.play-pause').not(".active").click(function() {
+        if(!$(this).hasClass("active")){
+            console.log(widget);
+            widget.seekTo(0);
+            $("#display_progress").empty();
+            widget.play(); 
+            widget["play"]();
+     
+        }else{
+            widget.pause();
+            // document.getElementById('display_progress').style.background = 'none';
+            // $(".noUi-midBar2").remove();
+            // $(".noUi-handle2").remove();
+        }
+       
     });
     
-    $jq('#pause_button').click(function() {
-        widget.pause();
-        document.getElementById('display_progress').style.background = 'none';
-    });
+ 
     
-    $jq('#prev_button').click(function() {
+    $('#prev_button').click(function() {
         widget.getDuration(function(duration) {
             widget.getPosition(function(position) {
                 widget.getCurrentSoundIndex(function(soundindex){
                     //display_time_count
                     var seconds = Math.floor((position / 1000) % 60);
                     var minutes = Math.floor((position / (60 * 1000)) % 60);
+                    
                     if ((seconds < 5) && (minutes==0))
                     {
+                        
                         if(soundindex == 0)
                         {
+                            Audio.info(allSongs.length-1);
                             widget.skip(allSongs.length-1); //Go to last Song of playlist
                         }
                         else
                         {
+                            Audio.info(soundindex-1);
                             widget.prev();
+
                         }
                     }
                     else
                     {
+                    
                         //Go to the beginning of the song if the song has past the first 5 seconds
                         widget.seekTo(0); 
                     }
@@ -184,13 +261,16 @@ $jq(document).ready(function() {
         });
 
     });
-    $jq('#next_button').click(function() {
+    $('#next_button').click(function() {
         widget.getCurrentSoundIndex(function(soundindex){
+            Audio.info(soundindex+1);
             if (soundindex == allSongs.length-1){
                 console.log("playlist  go to start")
                 widget.skip(0);
+                Audio.info(0);
             } else {
                 widget.next();
+                Audio.info(soundindex+1);
             }
         });
     });
@@ -202,6 +282,7 @@ $jq(document).ready(function() {
                     if ((soundindex == allSongs.length-1) && (paused == true)) {
                         console.log("playlist  go to start")
                         widget.skip(0);
+                        Audio.info(0);
                     };
                 });
             });
@@ -215,24 +296,24 @@ $jq(document).ready(function() {
                 var seconds = Math.floor((position / 1000) % 60);
                 var minutes = Math.floor((position / (60 * 1000)) % 60);
                 if (seconds < 10) {
-                    $jq('#display_time_count').text(minutes + ':0' + seconds);
+                    $('#display_time_count').text(minutes + ':0' + seconds);
                 } else {
-                    $jq('#display_time_count').text(minutes + ':' + seconds);
+                    $('#display_time_count').text(minutes + ':' + seconds);
                 };
 
                 if ((seconds<=1)&&(minutes===0)) {				
-                    var values = $jq('#volume_back').noUiSlider('value');
+                    var values = $('#volume_back').noUiSlider('value');
                     widget.setVolume(values[1]);
                     widget.getCurrentSound(function(currentSound) {
                         //console.log(currentSound);
-                        $jq('#display_song').text(currentSound['title']);
+                        $('#display_song').text(currentSound['title']);
                         var imageUrl = "";
                         if (currentSound['artwork_url'] == null) {
                             imageUrl = currentSound['user']['avatar_url'];
                         } else {
                             imageUrl = currentSound['artwork_url'];
                         }
-                        $jq('#display_coverart').css("background-image", 'url('+imageUrl+')'); 
+                        $('#display_coverart').css("background-image", 'url('+imageUrl+')'); 
                     });
                     
                     //display_time_total
@@ -240,9 +321,9 @@ $jq(document).ready(function() {
                         var seconds = Math.floor((duration / 1000) % 60);
                         var minutes = Math.floor((duration / (60 * 1000)) % 60);
                         if (seconds < 10) {
-                            $jq('#display_time_total').text(minutes + ':0' + seconds);
+                            $('#display_time_total').text(minutes + ':0' + seconds);
                         } else {
-                            $jq('#display_time_total').text(minutes + ':' + seconds);
+                            $('#display_time_total').text(minutes + ':' + seconds);
                         };
                     });
                 }
@@ -253,7 +334,7 @@ $jq(document).ready(function() {
                     document.getElementById('display_progress').style.background = 'none';
                 }
 
-                $jq("#display_progress").noUiSlider2('move', {
+                $("#display_progress").noUiSlider2('move', {
                     // moving the knob selected in the dropdown...
                     scale: [0, duration],
                     // to the position in the input field.
@@ -264,76 +345,88 @@ $jq(document).ready(function() {
     });
 });
 
-$jq(document).ready(function() {
+var Audio = {
+    allSongs:{},
+    info:function(id){
+        var this2 = $(".play-list .play").eq(id);
+        id = $(this2).data('id');
+        album = $(this2).data('album');
+        artist = $(this2).data('artist');
+        albumart = $(this2).data('albumart');
+        title = $(this2).data('title');
+        mp3 = $(this2).data('url');
+        this.load(id,album,artist,title,albumart,mp3);
+    },
+    load:function(id,album,artist,title,albumart,mp3){
+        var currentTrack;
+        var totalTrack=this.allSongs.length-1;
+        totalTrack = $('.play-list>a').length;
+        currentTrack = $('.play-list a').index($('.play-list .active'))+1;
+        $('.play-position').text((id+1)+' / '+totalTrack);
+        albumart=albumart?'<img src="'+albumart+'">':''; 
+        album=album?album:'Unknown Album';
+        title=title?title:'Unknown Title';
+        artist=artist?artist:'Unknown Artist';
+        $('.album-art').html(albumart);
+        $('.current-info .song-album').html('<i class="fa fa-music"></i> '+album);
+        $('.current-info .song-title').html('<i class="fa fa-headphones"></i> '+title);
+        $('.current-info .song-artist').html('<i class="fa fa-user"></i> '+artist);
+        if(mp3)
+        $('.audio').html('<audio class="music" data-id="'+id+'" src="'+mp3+'"></audio>');
+    },
+    playlist:{
+		show:function(){
+			$('.play-list').fadeIn(500);
+			$('.toggle-play-list').addClass('active');
+			$('.album-art').addClass('blur');
+		},
+		hide:function(){
+			$('.play-list').fadeOut(500);
+			$('.toggle-play-list').removeClass('active');
+			$('.album-art').removeClass('blur');
+		}
+    }
+}
+
+
+
+$(document).ready(function() {
     //first hide #scroll to top
     // hide #back-top first
-    $jq("#top_button").hide();
-    $jq(window).scroll(function() {
-        if ($jq(this).scrollTop() > 250) {
-            $jq('#top_button').fadeIn();
-        } else {
-            $jq('#top_button').fadeOut();
-        }
-    });
-    
-    //#SCROLL TO TOP
-    $jq('#top_button').click(function() {
-        if ($jq(document).scrollTop() < 400) {
-            $jq("html, body").animate({
-                scrollTop: 0
-            }, 300);
-            return false;
-        } else if ($jq(document).scrollTop() < 1000) {
-            $jq("html, body").animate({
-                scrollTop: 0
-            }, 600);
-            return false;
-        } else {
-            $jq("html, body").animate({
-                scrollTop: 0
-            }, 1000);
-            return false;
-        }
-    });
-    
-    $jq('#playlist_button, #display_coverart').bind("click", function() {
-        var nav = $jq('#current_playlist');
-        if (nav.hasClass('showing')) {
-            nav.removeClass('showing').addClass('hiding');
-        } else {
-            nav.removeClass('hiding').addClass('showing');
-        }
-    });
-    
-    $jq('#current_playlist_header').bind("click", function() {
-        var nav = $jq('#current_playlist');
-        if (nav.hasClass('showing')) {
-            nav.removeClass('showing').addClass('hiding');
-        } else {
-            nav.removeClass('hiding').addClass('showing');
+    $("#top_button").hide();
+
+    $('.toggle-play-list').on('click',function(e){
+        e.preventDefault();
+        var toggle = $(this);
+        if(toggle.hasClass('active')){
+            Audio.playlist.hide();
+        }else{
+            Audio.playlist.show();
         }
     });
 
+  
+
     //SLIDER FOR VOLUME_BACK
-    $jq(function() {
+    $(function() {
         var oldVolume=100;
         var init = function() { /* Create a slider */
-            $jq('#volume_back').noUiSlider('init', {
+            $('#volume_back').noUiSlider('init', {
                 start: [100],
                 scale: [0, 100],
                 handles: 1,
                 connect: "lower",
                 change: function() {
-                    var values = $jq(this).noUiSlider('value');
+                    var values = $(this).noUiSlider('value');
                     var widget = SC.Widget(document.getElementById('so'));
                     widget.getVolume(function(volume) {
                         widget.setVolume(values[1]/100);
                         //console.log('current volume value is ' + volume);
                         oldVolume = values[1];
                         //console.log('OLD VOLUME:' + oldVolume);
-                        if (values[1] > 50) $jq("#volume_speaker").attr("class", "volume_on");
-                        else if ((values[1] <= 50) && (values[1] >= 1)) $jq("#volume_speaker").attr("class", "volume_middle");
-                        else $jq("#volume_speaker").attr("class", "volume_off");
+                        if (values[1] > 50) $("#volume_speaker").attr("class", "volume_on");
+                        else if ((values[1] <= 50) && (values[1] >= 1)) $("#volume_speaker").attr("class", "volume_middle");
+                        else $("#volume_speaker").attr("class", "volume_off");
                     });
                 },
             });
@@ -341,12 +434,12 @@ $jq(document).ready(function() {
         init.call();
         
         //ON/OFF SPEAKER BUTTON
-        $jq('#volume_speaker').bind("click", function() {
+        $('#volume_speaker').bind("click", function() {
             var widget = SC.Widget(document.getElementById('so'));
             widget.getVolume(function(volume) {
-                var values = $jq('#volume_back').noUiSlider('value');
+                var values = $('#volume_back').noUiSlider('value');
                 if (values[1] > 0) {
-                    $jq('#volume_back').noUiSlider('move', {
+                    $('#volume_back').noUiSlider('move', {
                         // moving the knob selected in the dropdown...
                         scale: [0, 100],
                         // to the position in the input field.
@@ -354,12 +447,12 @@ $jq(document).ready(function() {
                     })
                     //VOLUME OFF IN SOUNDCLOUD    
                     widget.setVolume(0);
-                    $jq('#volume_speaker').attr("class", "volume_off");
+                    $('#volume_speaker').attr("class", "volume_off");
                 } else {
                     if ((oldVolume>0) && (oldVolume<=50)) {
                         widget.setVolume(oldVolume/100);			
-                        $jq("#volume_speaker").attr("class", "volume_middle");
-                        $jq("#volume_back").noUiSlider('move', {
+                        $("#volume_speaker").attr("class", "volume_middle");
+                        $("#volume_back").noUiSlider('move', {
                             // moving the knob selected in the dropdown...
                             scale: [0, 100],
                             // to the position in the input field.
@@ -367,21 +460,21 @@ $jq(document).ready(function() {
                         });
                     } else if (oldVolume>50) {
                         widget.setVolume(oldVolume/100);			
-                        $jq("#volume_speaker").attr("class", "volume_on");
-                        $jq("#volume_back").noUiSlider('move', {
+                        $("#volume_speaker").attr("class", "volume_on");
+                        $("#volume_back").noUiSlider('move', {
                             // moving the knob selected in the dropdown...
                             scale: [0, 100],
                             // to the position in the input field.
                             to: oldVolume
                         });
                     } else if (oldVolume==0) {
-                        $jq("#volume_back").noUiSlider('move', {
+                        $("#volume_back").noUiSlider('move', {
                             // moving the knob selected in the dropdown...
                             scale: [0, 100],
                             // to the position in the input field.
                             to: 100
                         });
-                        $jq("#volume_speaker").attr("class", "volume_on");
+                        $("#volume_speaker").attr("class", "volume_on");
                         widget.setVolume(1);
                     }
                 }
