@@ -210,10 +210,11 @@ $(document).ready(function() {
     $('.play-pause').not(".active").click(function() {
         if(!$(this).hasClass("active")){
             console.log(widget);
-            widget.seekTo(0);
+            
             $("#display_progress").empty();
             widget.play(); 
-            widget["play"]();
+            widget.seekTo(0);
+         //widget["play"]();
      
         }else{
             widget.pause();
@@ -241,11 +242,16 @@ $(document).ready(function() {
                         {
                             Audio.info(allSongs.length-1);
                             widget.skip(allSongs.length-1); //Go to last Song of playlist
+
+                            widget.seekTo(0);
+
                         }
                         else
                         {
                             Audio.info(soundindex-1);
                             widget.prev();
+
+                            widget.seekTo(0);
 
                         }
                     }
@@ -267,9 +273,13 @@ $(document).ready(function() {
                 console.log("playlist  go to start")
                 widget.skip(0);
                 Audio.info(0);
+                widget.seekTo(0);
+
             } else {
                 widget.next();
                 Audio.info(soundindex+1);
+                widget.seekTo(0);
+
             }
         });
     });
