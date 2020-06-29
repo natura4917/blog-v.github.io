@@ -1,6 +1,6 @@
 ## https://natura.dev
-<br>
-``` js
+
+```
 NATURA의 개인 홈페이지 입니다.
 ```
 
