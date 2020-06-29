@@ -429,11 +429,12 @@ $(document).ready(function() {
                     var values = $(this).noUiSlider('value');
                     var widget = SC.Widget(document.getElementById('so'));
                     widget.getVolume(function(volume) {
-                        widget.setVolume(values[1]/100);
+                        widget.setVolume(values[1]);
+                     
                         //console.log('current volume value is ' + volume);
                         oldVolume = values[1];
                         //console.log('OLD VOLUME:' + oldVolume);
-                        if (values[1] > 50) $("#volume_speaker").attr("class", "volume_on");
+                        if (values[1] > 0) $("#volume_speaker").attr("class", "volume_on");
                         else if ((values[1] <= 50) && (values[1] >= 1)) $("#volume_speaker").attr("class", "volume_middle");
                         else $("#volume_speaker").attr("class", "volume_off");
                     });
