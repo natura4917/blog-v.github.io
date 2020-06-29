@@ -1,2 +1,8 @@
-# natura.dev
+## https://natura.dev
+<br>
+``` js
+NATURA의 개인 홈페이지 입니다.
+```
 
+* [x] SOUNDCLOUD 추가
+* [ ] 블로그 추가
