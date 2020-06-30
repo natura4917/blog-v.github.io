@@ -380,8 +380,6 @@ var Audio = {
         $('.current-info .song-album').html('<i class="fa fa-music"></i> '+album);
         $('.current-info .song-title').html('<i class="fa fa-headphones"></i> '+title);
         $('.current-info .song-artist').html('<i class="fa fa-user"></i> '+artist);
-        if(mp3)
-        $('.audio').html('<audio class="music" data-id="'+id+'" src="'+mp3+'"></audio>');
     },
     playlist:{
 		show:function(){
