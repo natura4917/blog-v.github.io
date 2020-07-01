@@ -28,7 +28,7 @@ $(document).ready(function() {
                     "data-title": d.title,
                     "data-artist": d.user.username,
                     "data-albumart": imageUrl,
-                    "data-album": d.description,
+                    "data-album": '', // 없음 추후에 좋아요 수로 변경예정
                     "data-duration":d.duration
                 }));
 
