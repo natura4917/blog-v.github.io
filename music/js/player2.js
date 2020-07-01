@@ -14,7 +14,7 @@ $(document).ready(function() {
             Audio.allSongs=allSongs;
             $.each(allSongs,function(i,d) {
 		    // 예외처리
-		    if(d[uri] == undefined ){
+		    if(d['uri'] == undefined ){
 			return true;    
 		    }
                 if (d['artwork_url'] == null) {
