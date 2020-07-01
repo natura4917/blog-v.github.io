@@ -12,13 +12,11 @@ $(document).ready(function() {
 
             allSongs = allSounds;
             Audio.allSongs=allSongs;
-            // data-id="1"
-            // data-album=""
-            // data-artist="Wiz Khalifa feat. Charlie Puth"
-            // data-title="See You Again"
-            // data-albumart="http://static.djbooth.net/pics-tracks/wiz-khalifa-see-you-again.jpg"
-            // data-url="http://trendingmp3.com/music/user_folder/Wiz%20Khalifa%20See%20You%20Again%20Feat%20Charlie%20Puth%20-%201426839506.mp3"></a>
             $.each(allSongs,function(i,d) {
+		    // 예외처리
+		    if(d[uri] == undefined ){
+			return true;    
+		    }
                 if (d['artwork_url'] == null) {
                     imageUrl = d['user']['avatar_url'];
                 } else {
