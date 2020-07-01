@@ -14,13 +14,13 @@ $(document).ready(function() {
             Audio.allSongs=allSongs;
             $.each(allSongs,function(i,d) {
 		    // 예외처리
-		    if(d['uri'] == undefined ){
+		    if(d.uri === undefined ){
 			return true;    
 		    }
-                if (d['artwork_url'] == null) {
-                    imageUrl = d['user']['avatar_url'];
+                if (d.artwork_url == null) {
+                    imageUrl = d.user.avatar_url;
                 } else {
-                    imageUrl = d['artwork_url'];
+                    imageUrl = d.artwork_url;
                 }
                 $('.play-list').append($('<a/>', {
                     class: 'play',
