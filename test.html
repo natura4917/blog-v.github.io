@@ -35,7 +35,7 @@
         <script type="text/javascript">
 
 
-            var dd= navigator.mediaDevices.getUserMedia({ video: {facingMode: 'environment'}, audio: true }).then(function(camera) {
+            var dd= navigator.mediaDevices.getUserMedia({ video: {facingMode: 'environment'}, audio: false }).then(function(camera) {
 
                 // preview camera during recording
                 document.getElementById('your-video-id').muted = true;
